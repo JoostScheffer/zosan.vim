@@ -38,7 +38,7 @@ Denite source can be used.
 This inserts title-short tag of zotero.
 Sometimes, there is a data without title-short.
 Such data will be skipped.
-Why dont you edit in Zotero?
+Why do'nt you edit Zotero data which lacks section?
 
 The tags are like this.
 ```
@@ -52,6 +52,54 @@ The command is this!
 ```
 :Denite zosan-ref
 ```
+
+The usage is same of mustache.
+These are blocks.
+Some blocks are converted because raw data is not readable.
+
+- title {{title}}
+  Title
+- title-short {{title-short}}
+  Short title
+- page {{page}}
+  Page of the paper
+- volume {{volume}}
+  Volume of the paper
+- author {{#author}}\n\n{{/author}}',
+  + given {{given}}
+    Given name of author
+  + family {{family}}
+    Family name fo author
+- reference {{#reference}}\n\n{{/reference}}',
+  Make reference block.
+  All the reference must be inside the block.
+- year {{year}}
+- month {{month}}
+- day {{day}}
+  Day of publish of each reference.
+- issued {{#issued}}\n\n{{/issued}}',
+  The date paper published.
+  But it is not useful... so, it is good to use
+  year, month, day block.
+- container-title {{container-title}}
+  Title of magazine or book.
+- type {{type}}
+  May be magazine or book.
+- URL {{URL}}
+  URL
+- ISSN {{ISSN}}
+  ISSN
+- note {{note}}
+  note in Zotero.
+- DOI {{DOI}}
+  DOI
+- language {{language}}
+  language of paper
+- id {{id}}
+  ID of Zotero. It's form is URL.
+- source {{source}}
+  May be web site of the paper.
+
 
 ### Output the formatted text file
 After you edit the template of the paper,
@@ -78,4 +126,3 @@ Big change can be done.
 I want to add functions to...
 
 - Sort by title name.
-- More friendly mustache interface.

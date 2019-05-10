@@ -1,4 +1,7 @@
 from .base import Base
+from itertools import filterfalse
+from denite.base.kind import Base as Kind
+from denite.kind.openable import Kind as Openable
 from typing import Any
 from pathlib import Path
 from denite import util, process
@@ -9,8 +12,7 @@ import json
 class Source(Base):
     def __init__(self, vim: Any) -> None:
         super().__init__(vim)
-        self.name = 'zosan'
-        self.kind = 'word'
+        self.name = 'zosan-help'
         self.library_name = vim.eval('g:zotero_filename')
 
     def on_init(self, context: dict) -> None:
@@ -26,8 +28,9 @@ class Source(Base):
             with open(self.library_name) as fp:
                 data_set = json.load(fp)
             data_set = list(filter(lambda x: 'title-short' in x, data_set))
-            self.data = [{'abbr': x['title-short'],
-                          'word': '@[' + x['title-short'] + ']'}
+            data_set = list(filter(lambda x: 'abstract' in x, data_set))
+            self.data = [{'word': x['title-short'],
+                          'abbr': x['title-short']}
                          for x in data_set]
             return self.data
         except:
