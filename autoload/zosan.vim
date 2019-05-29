@@ -30,11 +30,11 @@ class Zosan:
     def __init__(self, data_set: str) -> None:
         with open(data_set) as fp:
             data = json.load(fp)
-        data = list(filter(lambda x: 'title-short' in x,
+        data = list(filter(lambda x: 'title' in x,
                            data))
         self.data_set = {'data_set': data}
     def read(self, token):
-        result = list(filter(lambda x: x['title-short'] == token,
+        result = list(filter(lambda x: x['title'] == token,
                              self.data_set['data_set']))[0]['abstract']
         return result
 
@@ -56,23 +56,26 @@ class Zosan:
     def __init__(self, data_set: str) -> None:
         with open(data_set) as fp:
             data = json.load(fp)
-        # I want to use title-short as tag.
+        # I want to use title as tag.
         # Because, it is long but may be readable.
-        data = list(filter(lambda x: 'title-short' in x,
+        data = list(filter(lambda x: 'title' in x,
                            data))
         # let issue day out of issued section.
         # Almost all of casese, another section 'accessed' is
         # useless when writing paper.
         for d in data:
             if 'issued' in d:
-                if len(d['issued']['date-parts'][0]) == 3:
-                    d.update({'year': d['issued']['date-parts'][0][0],
-                              'month': d['issued']['date-parts'][0][1],
-                              'day': d['issued']['date-parts'][0][2]})
-                if len(d['issued']['date-parts'][0]) == 2:
-                    d.update({'year': d['issued']['date-parts'][0][0]})
-                if len(d['issued']['date-parts'][0]) == 1:
-                    d.update({'year': d['issued']['date-parts'][0][0]})
+                try:
+                    if len(d['issued']['date-parts'][0]) == 3:
+                        d.update({'year': d['issued']['date-parts'][0][0],
+                                  'month': d['issued']['date-parts'][0][1],
+                                  'day': d['issued']['date-parts'][0][2]})
+                    if len(d['issued']['date-parts'][0]) == 2:
+                        d.update({'year': d['issued']['date-parts'][0][0]})
+                    if len(d['issued']['date-parts'][0]) == 1:
+                        d.update({'year': d['issued']['date-parts'][0][0]})
+                except:
+                    pass
         self.data_set = {'data_set': data}
         self.text: str
 
@@ -92,7 +95,7 @@ class Zosan:
         '''
         reference: dict = {'reference': []}
         for r in self.data_set['data_set']:
-            tag = self.make_tag(r['title-short'])
+            tag = self.make_tag(r['title'])
             if tag in self.text:
                 r['_loc'] = self.text.find(tag)
                 reference['reference'].append(r)
@@ -105,7 +108,7 @@ class Zosan:
             line += 1
         result: str = pystache.render(self.text, reference)
         for r in reference['reference']:
-            tag = self.make_tag(r['title-short'])
+            tag = self.make_tag(r['title'])
             result = result.replace(tag, '[' + str(r['loc']) + ']')
         return result
 

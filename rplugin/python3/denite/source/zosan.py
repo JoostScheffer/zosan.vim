@@ -7,6 +7,7 @@ import json
 
 
 class Source(Base):
+
     def __init__(self, vim: Any) -> None:
         super().__init__(vim)
         self.name = 'zosan'
@@ -25,10 +26,13 @@ class Source(Base):
         try:
             with open(self.library_name) as fp:
                 data_set = json.load(fp)
-            data_set = list(filter(lambda x: 'title-short' in x, data_set))
-            self.data = [{'abbr': x['title-short'],
-                          'word': '@[' + x['title-short'] + ']'}
+            data_set = list(filter(lambda x: 'title' in x, data_set))
+            self.data = [{'abbr': x['title'],
+                          'word': '@[' + x['title'] + ']'}
                          for x in data_set]
             return self.data
+        except FileNotFoundError:
+            return [{'word':
+                     'There is no Zotero file. Is there Zotero file..?'}]
         except:
-            return [{'word': 'Something went wrong.Is there Zotero file..?'}]
+            return [{'word': 'Something went wrong.'}]

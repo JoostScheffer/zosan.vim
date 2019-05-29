@@ -27,11 +27,14 @@ class Source(Base):
         try:
             with open(self.library_name) as fp:
                 data_set = json.load(fp)
-            data_set = list(filter(lambda x: 'title-short' in x, data_set))
+            data_set = list(filter(lambda x: 'title' in x, data_set))
             data_set = list(filter(lambda x: 'abstract' in x, data_set))
-            self.data = [{'word': x['title-short'],
-                          'abbr': x['title-short']}
+            self.data = [{'word': x['title'],
+                          'abbr': x['title']}
                          for x in data_set]
             return self.data
+        except FileNotFoundError:
+            return [{'word':
+                     'There is no Zotero file. Is there Zotero file..?'}]
         except:
-            return [{'word': 'Something went wrong.Is there Zotero file..?'}]
+            return [{'word': 'Something went wrong.'}]
