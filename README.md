@@ -35,14 +35,17 @@ Denite source can be used.
 :Denite zosan
 ```
 
-This inserts title-short tag of zotero.
-Sometimes, there is a data without title-short.
-Such data will be skipped.
-Why do'nt you edit Zotero data which lacks section?
+This inserts title tag of zotero.
 
 The tags are like this.
 ```
 @[Life of Zosan]
+```
+Unfortunately, title of paper is too long.
+If you want to use id of zotero, write it in vimrc.
+
+```
+let g:zotero_useid = 1
 ```
 
 ### Make Reference

@@ -12,6 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let g:loaded_zosan = 1
+let g:zotero_useid = 1
 
 " Default file name of jsonfile from Zotero.
 let g:zotero_filename = 'My Library.json'

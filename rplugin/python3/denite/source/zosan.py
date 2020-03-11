@@ -13,6 +13,7 @@ class Source(Base):
         self.name = 'zosan'
         self.kind = 'word'
         self.library_name = vim.eval('g:zotero_filename')
+        self.use_id = True if vim.eval('g:zotero_useid') == 1 else False
 
     def on_init(self, context: dict) -> None:
         context['__proc'] = None
@@ -27,12 +28,20 @@ class Source(Base):
             with open(self.library_name) as fp:
                 data_set = json.load(fp)
             data_set = list(filter(lambda x: 'title' in x, data_set))
-            self.data = [{'abbr': x['title'],
-                          'word': '@[' + x['title'] + ']'}
-                         for x in data_set]
+            if self.use_id:
+                self.data = [{'abbr': x['title'],
+                              'word': '@[' + x['id'].split('/')[-1] + ']'}
+                             for x in data_set]
+            else:
+                self.data = [{'abbr': x['title'],
+                              'word': '@[' + x['title'] + ']'}
+                             for x in data_set]
             return self.data
         except FileNotFoundError:
-            return [{'word':
-                     'There is no Zotero file. Is there Zotero file..?'}]
+            return [{'word': '', 'abbr': 'There is no Zotero JSON file.'},
+                    {'word': '', 'abbr': 'Please export JSON file from zotero,'},
+                    {'word': '', 'abbr': 'and put it in this directory.'},
+                    {'word': '', 'abbr': 'The name of file should be "'
+                     + self.library_name + '"'}]
         except:
-            return [{'word': 'Something went wrong.'}]
+            return [{'word': '', 'abbr': 'Something went wrong.'}]

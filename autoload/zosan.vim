@@ -26,21 +26,31 @@ function! zosan#reader (token)
 python3 << zosan_reader
 import json
 import vim
+
+
 class Zosan:
     def __init__(self, data_set: str) -> None:
         with open(data_set) as fp:
             data = json.load(fp)
-        data = list(filter(lambda x: 'title' in x,
-                           data))
-        self.data_set = {'data_set': data}
-    def read(self, token):
-        result = list(filter(lambda x: x['title'] == token,
-                             self.data_set['data_set']))[0]['abstract']
-        return result
+        self.use_id = True if vim.eval('g:zotero_useid') == '1' else False
+        self.data = list(filter(lambda x: 'title' in x, data))
 
-st = Zosan(vim.eval('g:zotero_filename'))
-result = st.read(vim.eval('a:token'))
-print(result)
+    def read(self, token):
+        if self.use_id:
+            for data in self.data:
+                if token in data['id']:
+                    print(data['title'])
+                    print('--------------------')
+                    print(data['abstract'])
+        else:
+            for data in self.data:
+                if token == data['title']:
+                    print(data['title'])
+                    print('--------------------')
+                    print(data['abstract'])
+
+
+Zosan(vim.eval('g:zotero_filename')).read(vim.eval('a:token'))
 zosan_reader
 endfunction
 
@@ -58,11 +68,11 @@ class Zosan:
             data = json.load(fp)
         # I want to use title as tag.
         # Because, it is long but may be readable.
-        data = list(filter(lambda x: 'title' in x,
-                           data))
+        data = list(filter(lambda x: 'title' in x, data))
         # let issue day out of issued section.
         # Almost all of casese, another section 'accessed' is
         # useless when writing paper.
+        self.use_id = True if vim.eval('g:zotero_useid') == '1' else False
         for d in data:
             if 'issued' in d:
                 try:
@@ -76,7 +86,7 @@ class Zosan:
                         d.update({'year': d['issued']['date-parts'][0][0]})
                 except:
                     pass
-        self.data_set = {'data_set': data}
+        self.data = data
         self.text: str
 
     def set_text(self, text_fname: str) -> None:
@@ -94,29 +104,32 @@ class Zosan:
         Let json usable from mustashe engine.
         '''
         reference: dict = {'reference': []}
-        for r in self.data_set['data_set']:
-            tag = self.make_tag(r['title'])
+        for data in self.data:
+            if self.use_id:
+                tag = self.make_tag(data['id'])
+            else:
+                tag = self.make_tag(data['title'])
             if tag in self.text:
-                r['_loc'] = self.text.find(tag)
-                reference['reference'].append(r)
+                data['_loc'] = self.text.find(tag)
+                reference['reference'].append(data)
 
         reference['reference'] = sorted(reference['reference'],
                                         key=lambda x: x['_loc'])
         line = 1
-        for r in reference['reference']:
-            r['loc'] = line
+        for ref in reference['reference']:
+            ref['loc'] = line
             line += 1
         result: str = pystache.render(self.text, reference)
-        for r in reference['reference']:
-            tag = self.make_tag(r['title'])
-            result = result.replace(tag, '[' + str(r['loc']) + ']')
+        for ref in reference['reference']:
+            tag = self.make_tag(ref['title'])
+            result = result.replace(tag, '[' + str(ref['loc']) + ']')
         return result
 
 
 st = Zosan(vim.eval('g:zotero_filename'))
 st.set_text(vim.current.buffer.name)
 with open(vim.eval('a:fname'), 'w') as fp:
-  fp.write(st.make_data_for_zotero())
+    fp.write(st.make_data_for_zotero())
 zosan
 endfunction
 
