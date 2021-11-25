@@ -7,7 +7,7 @@ Zotero wo Sansho suru!
 ## What is Zosan?
 Zosan is a plugin to use Zotero.
 Not for latex or MSword, but for Markdown.
-This uses mustache tepmlate engine.
+This uses mustache template engine.
 And make reference.
 
 ## Install and requirement
